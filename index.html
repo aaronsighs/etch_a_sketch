@@ -1,0 +1,297 @@
+<style>
+    body{
+        background-color:grey;
+        display: inline-block;
+        width:100%;
+        color:white;
+        text-align: center;
+        background-color: #cc0700;
+background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre-big.png");
+        
+    }
+
+    div.grid-system{
+        margin:auto;
+        border: 10px solid lightgrey;
+
+
+        height:650px;
+        width:650px;
+        max-height:100%;
+
+        background-color: white;
+        display:grid;
+        grid-template-columns: repeat(5,10px);
+        grid-template-rows: repeat(5,10px);
+        content: fit;
+        
+
+    }
+
+    @media screen and (max-width: 900px) {
+        div.grid-system{
+            height:80%;
+            width:80%;
+        }
+}
+
+    .knob{
+        position: absolute;
+        height:100px;
+        width:100px;
+        background-color:white;
+        border-radius: 100%;
+        box-shadow: -1px -3px black;
+    }
+
+    .k1{
+        left:1%;
+    }
+    .k2{
+        right:1%;
+    }
+
+    .control-box > * {
+        display: inline;
+        padding:10px;
+    }
+
+    .container{
+        width:80%;
+        padding:1%;
+    }
+
+    .control-box{
+        color:rgb(255, 255, 255);
+        display:grid;
+        background-color: rgba(196, 196, 204, 0.274);
+        border-radius: 20px;
+        width:85%;
+        margin:1% 7.5% 1% 7.5%;
+        min-height:50px;
+    }
+
+    fieldset{
+        border:0px;
+        text-align: center;
+        margin-left: 10%;
+    }
+    fieldset > * {
+        margin:3px;
+    }
+
+    .grid-node{
+        background-color:#ffffff;
+        
+        /* border: 1px solid black; */
+    }
+
+</style>
+
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <h1>Etch-a-sketch</h1>
+        <div class="control-box">
+            <fieldset class="container">
+            <input class="drag-toggle" name="drag-toggle" type="checkbox" value=0></input<label name="drag-toggle">drag</label>
+          
+            <input id="backgroundPicker" value="#ffffff" type="color">
+            <label>background</label>
+            <input id="colorPicker" value="black" type="color">
+            <label>cursor</label>
+               
+                <input type="radio" name="drawing-type" id="rainbow">
+                <label>rainbow</label>
+                <input type="radio" name="drawing-type" id="normal">
+
+                <label>normal</label>
+                <input type="radio" name="drawing-type" id="eraser">
+                <label>eraser</label>
+               
+                <input class="size" type="range" max="100" min="1" value="32">
+                <label>size:</label>
+                <span class="size-txt">32</span>
+                <button id="clear">clear</button>
+
+                
+
+            </fieldset>
+
+        </div>
+
+        <div class="grid-system">
+
+        </div>
+        <div class=" knob k1"></div>
+        <div class="knob k2"></div>
+        
+
+    </body>
+</html>
+
+
+
+
+<script>
+
+
+
+
+    let lastBackgroundColor = "rgb(255, 255, 255)";
+    let cursorType = "normal";
+    let requireMouseDown = 0;
+    document.querySelector(".drag-toggle").checked = requireMouseDown;
+    document.getElementById("colorPicker").value = "black";
+    document.getElementById("backgroundPicker").value = "#ffffff";
+    document.getElementById("normal").checked = 1;
+    document.getElementById("clear").addEventListener('click',clear)
+    let slider = document.getElementsByClassName("size")[0];
+    slider.value = 32;
+
+    createGrid(slider.value);
+
+
+
+
+    slider.addEventListener('change', e =>{
+    slider.value=e.target.value;
+    document.querySelector(".size-txt").textContent = e.target.value;
+    removeGrid();
+    createGrid(e.target.value);
+    }
+    )
+
+    
+
+   
+
+    function clear(){
+        removeGrid();
+        createGrid(slider.value);
+    }
+
+
+
+
+   Array.from(document.querySelectorAll('input[name="drawing-type"]')).forEach( radio=>radio.addEventListener('click',e=>{
+
+    if (e.target.checked){
+           cursorType = e.target.id;
+       }
+   }));
+
+
+   function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
+
+
+
+   function removeGrid(){
+    let grid = document.querySelector(".grid-system");
+    removeAllChildNodes(grid);
+   }
+
+
+
+    function changeBackground(color){
+        Array.from(document.querySelectorAll(".grid-node")).forEach( node=>{
+          
+            if (node.style.backgroundColor === lastBackgroundColor)
+
+                node.style.backgroundColor = color;
+        })
+        lastBackgroundColor = color;
+        
+    }
+    function hexTorgb(hex) {
+  return ['0x' + hex[1] + hex[2] | 0, '0x' + hex[3] + hex[4] | 0, '0x' + hex[5] + hex[6] | 0];
+}
+
+
+    document.getElementById("backgroundPicker").addEventListener('change',e=>{
+        let newColor = hexTorgb(e.target.value)
+        newColor = `rgb(${newColor[0]}, ${newColor[1]}, ${newColor[2]})`
+        if (newColor !== lastBackgroundColor)
+        changeBackground(newColor);
+    })
+
+
+
+
+    document.querySelector(".drag-toggle").addEventListener("click", e=> {
+        requireMouseDown = e.target.checked;
+    })
+
+
+
+
+
+
+
+
+    function createGrid(size){
+        let grid = document.querySelector(".grid-system");
+        grid.addEventListener("mousedown" ,e=>{e.preventDefault()})
+        grid.style.gridTemplateColumns=`repeat(${size},auto)`;
+        grid.style.gridTemplateRows=`repeat(${size},auto)`;
+        for (i=0;i<size**2;i++){
+            let gridNode = document.createElement("div");
+            gridNode.classList.add("grid-node");
+            gridNode.style.backgroundColor = lastBackgroundColor;
+            gridNode.addEventListener("mousemove",mouseHover);
+            gridNode.addEventListener("click",mouseHover);
+            grid.appendChild(gridNode);
+        }
+    }
+
+
+    function addColors(c1,c2,factor=1){
+        c1 = c1.replace(")","").replace("rgb(","").split(",");
+        c2 = c2.replace(")","").replace("rgb(","").split(",");
+        return `rgb(${c1[0] + +c2[0]*factor},${c1[1] + +c2[1]*factor},${c1[2] + +c2[2]*factor})`
+    }
+
+    function mouseHover(e){
+                if (e.type!=="click" && requireMouseDown && !e.buttons)
+                    return e;
+                    if (cursorType==="rainbow")
+                        e.target.style.backgroundColor = getRandomColor();
+                    else if (cursorType==="eraser")
+                        e.target.style.backgroundColor = lastBackgroundColor;
+                    else  
+                        e.target.style.backgroundColor = document.getElementById("colorPicker").value;
+
+                e.preventDefault();
+            }
+    function mouseDown(e){
+                e.target.addEventListener("mousemove",mouseHover(e))
+
+                e.preventDefault()
+            }
+
+    function getRandomColor(){
+        return `rgb(${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)})`
+    }
+
+    
+        
+
+    
+
+
+
+</script>
