@@ -116,6 +116,9 @@ background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre
                 <input type="radio" name="drawing-type" id="normal">
 
                 <label>normal</label>
+                <input type="radio" name="drawing-type" id="random">
+
+                <label>random</label>
                 <input type="radio" name="drawing-type" id="eraser">
                 <label>eraser</label>
                
@@ -151,6 +154,7 @@ background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre
     let lastBackgroundColor = "rgb(255, 255, 255)";
     let cursorType = "normal";
     let requireMouseDown = 0;
+    let counter = 0;
     document.querySelector(".drag-toggle").checked = requireMouseDown;
     document.getElementById("colorPicker").value = "black";
     document.getElementById("backgroundPicker").value = "#ffffff";
@@ -253,7 +257,7 @@ background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre
             gridNode.classList.add("grid-node");
             gridNode.style.backgroundColor = lastBackgroundColor;
             gridNode.addEventListener("mousemove",mouseHover);
-            gridNode.addEventListener("click",mouseHover);
+            //gridNode.addEventListener("click",mouseHover);
             grid.appendChild(gridNode);
         }
     }
@@ -269,9 +273,11 @@ background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre
                 if (e.type!=="click" && requireMouseDown && !e.buttons)
                     return e;
                     if (cursorType==="rainbow")
-                        e.target.style.backgroundColor = getRandomColor();
+                        e.target.style.backgroundColor = rainBow();
                     else if (cursorType==="eraser")
                         e.target.style.backgroundColor = lastBackgroundColor;
+                    else if (cursorType==="random")
+                        e.target.style.backgroundColor = getRandomColor();
                     else  
                         e.target.style.backgroundColor = document.getElementById("colorPicker").value;
 
@@ -282,6 +288,16 @@ background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre
 
                 e.preventDefault()
             }
+    
+    
+    function rainBow(){
+        counter = counter === 6 ? 0:++counter;
+        return ["red", "orange", "yellow", "green", "blue", "indigo","violet "][counter]
+
+
+
+
+    }
 
     function getRandomColor(){
         return `rgb(${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)})`
@@ -295,3 +311,6 @@ background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre
 
 
 </script>
+
+
+
